@@ -4,12 +4,14 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.kiwicampus.loomo"
-        minSdkVersion 21
+        minSdkVersion 22
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -36,8 +38,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     // Loomo  dependencies
     implementation 'com.segway.robot:basesdk:0.6.746'
+    implementation 'com.segway.robot:support-lib:1.1.2'
 
 }

@@ -26,28 +26,44 @@ class MainActivity : AppCompatActivity() {
 
             override fun onBind() {
             }
-
         })
-        loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
+    }
+
+    private fun cleanLoomoPose() {
         // clean loomo position
         loomoBase.cleanOriginalPoint()
         // get actual loomo position
         val pose = loomoBase.getOdometryPose(-1)
         // set initial position to loomo
         loomoBase.setOriginalPoint(pose)
-        // works like a coordinate system
-        // starts in 0, 0
-        // x coordinate --> vertically
-        // y coordinate --> horizontally
-        // 1f, 0f means 1 meter front 0 horizontally
-        loomoBase.addCheckPoint(1f, 0f)
-        // 1f, 1f means 1 meter front (already taken) 1 horizontally
-        loomoBase.addCheckPoint(1f, 1f)
     }
 
     private fun setClickListeners() {
         binding.btnTest.setOnClickListener {
-
+            loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
+            cleanLoomoPose()
+            // works like a coordinate system
+            // starts in 0, 0
+            // x coordinate --> vertically
+            // y coordinate --> horizontally
+            // 1f, 0f means 1 meter front 0 horizontally
+            loomoBase.addCheckPoint(1f, 0f)
+            // 1f, 1f means 1 meter front (already taken) 1 horizontally
+            loomoBase.addCheckPoint(1f, 1f)
+        }
+        binding.btnTest2.setOnClickListener {
+            loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
+            cleanLoomoPose()
+            // 1f, 0f means 1 meter front 0 horizontally
+            loomoBase.addCheckPoint(1f, 0f)
+            // 1f, 1f means 1 meter front (already taken) 1 horizontally,
+            loomoBase.addCheckPoint(1f, 1f, (Math.PI / 2).toFloat())
+        }
+        binding.btnTest3.setOnClickListener {
+            loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
+            cleanLoomoPose()
+            loomoBase.addCheckPoint(1f, 0f)
+            loomoBase.addCheckPoint(1f, 1f, (-Math.PI / 2).toFloat())
         }
     }
 }
