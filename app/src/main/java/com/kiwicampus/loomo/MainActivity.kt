@@ -48,22 +48,20 @@ class MainActivity : AppCompatActivity() {
             // y coordinate --> horizontally
             // 1f, 0f means 1 meter front 0 horizontally
             loomoBase.addCheckPoint(1f, 0f)
-            // 1f, 1f means 1 meter front (already taken) 1 horizontally
-            loomoBase.addCheckPoint(1f, 1f)
+            // 1f, 1f means 1 meter front (already taken) 1 horizontally,
+            loomoBase.addCheckPoint(1f, 1f, (Math.PI / 2).toFloat())
         }
         binding.btnTest2.setOnClickListener {
             loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
             cleanLoomoPose()
-            // 1f, 0f means 1 meter front 0 horizontally
-            loomoBase.addCheckPoint(1f, 0f)
-            // 1f, 1f means 1 meter front (already taken) 1 horizontally,
-            loomoBase.addCheckPoint(1f, 1f, (Math.PI / 2).toFloat())
+            loomoBase.addCheckPoint(1f, 0f, (2 * Math.PI).toFloat())
         }
         binding.btnTest3.setOnClickListener {
             loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
             cleanLoomoPose()
             loomoBase.addCheckPoint(1f, 0f)
-            loomoBase.addCheckPoint(1f, 1f, (-Math.PI / 2).toFloat())
+            loomoBase.addCheckPoint(1f, 0.5f, (-Math.PI).toFloat())
+            loomoBase.addCheckPoint(2f, 0.5f, (2 * Math.PI).toFloat())
         }
     }
 }
