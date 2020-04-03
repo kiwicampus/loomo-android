@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         loomoBase.setOriginalPoint(pose)
     }
 
-    private fun initLoomoNavigation(){
+    private fun initLoomoNavigation() {
         loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
         cleanLoomoPose()
     }
@@ -79,6 +79,17 @@ class MainActivity : AppCompatActivity() {
         binding.btnTest6.setOnClickListener {
             initLoomoNavigation()
             loomoBase.addCheckPoint(0f, 0f, (-Math.PI / 2).toFloat())
+        }
+        binding.btnTest7.setOnClickListener {
+            initLoomoNavigation()
+            loomoBase.addCheckPoint(0f, 0f, (Math.PI / 4).toFloat())
+            loomoBase.addCheckPoint(0f, 0f, (Math.PI / 2).toFloat())
+            loomoBase.addCheckPoint(0f, 0f, ((3 * Math.PI) / 4).toFloat())
+            loomoBase.addCheckPoint(0f, 0f, (Math.PI).toFloat())
+            loomoBase.addCheckPoint(0f, 0f, ((5 * Math.PI) / 4).toFloat())
+            loomoBase.addCheckPoint(0f, 0f, ((3 * Math.PI) / 2).toFloat())
+            loomoBase.addCheckPoint(0f, 0f, ((7 * Math.PI) / 4).toFloat())
+            loomoBase.addCheckPoint(0f, 0f, (2 * Math.PI).toFloat())
         }
     }
 }
