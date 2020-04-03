@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
             loomoBase.setAngularVelocity(3f)
             loomoBase.addCheckPoint(1f, 1f, (Math.PI).toFloat())
             Timber.d("🔚Final velocities Linear ${loomoBase.linearVelocity} ")
-            Timber.d("Angular velocitiy ${loomoBase.angularVelocity}")
+            Timber.d("Final Angular velocity ${loomoBase.angularVelocity}")
 
         }
     }
