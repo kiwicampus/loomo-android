@@ -38,10 +38,14 @@ class MainActivity : AppCompatActivity() {
         loomoBase.setOriginalPoint(pose)
     }
 
+    private fun initLoomoNavigation(){
+        loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
+        cleanLoomoPose()
+    }
+
     private fun setClickListeners() {
         binding.btnTest.setOnClickListener {
-            loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
-            cleanLoomoPose()
+            initLoomoNavigation()
             // works like a coordinate system
             // starts in 0, 0
             // x coordinate --> vertically
@@ -52,16 +56,29 @@ class MainActivity : AppCompatActivity() {
             loomoBase.addCheckPoint(1f, 1f, (Math.PI / 2).toFloat())
         }
         binding.btnTest2.setOnClickListener {
-            loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
-            cleanLoomoPose()
+            initLoomoNavigation()
             loomoBase.addCheckPoint(1f, 0f, (2 * Math.PI).toFloat())
         }
         binding.btnTest3.setOnClickListener {
-            loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
-            cleanLoomoPose()
+            initLoomoNavigation()
             loomoBase.addCheckPoint(1f, 0f)
             loomoBase.addCheckPoint(1f, 0.5f, (-Math.PI).toFloat())
             loomoBase.addCheckPoint(2f, 0.5f, (2 * Math.PI).toFloat())
+        }
+        binding.btnTest4.setOnClickListener {
+            initLoomoNavigation()
+            loomoBase.addCheckPoint(1f, 0f)
+            loomoBase.addCheckPoint(1f, 1f)
+            loomoBase.addCheckPoint(0f, 1f)
+            loomoBase.addCheckPoint(0f, 0f)
+        }
+        binding.btnTest5.setOnClickListener {
+            initLoomoNavigation()
+            loomoBase.addCheckPoint(0f, 0f, (Math.PI / 2).toFloat())
+        }
+        binding.btnTest6.setOnClickListener {
+            initLoomoNavigation()
+            loomoBase.addCheckPoint(0f, 0f, (-Math.PI / 2).toFloat())
         }
     }
 }

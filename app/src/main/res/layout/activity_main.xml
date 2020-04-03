@@ -7,47 +7,94 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btnTest"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Test 1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="HardcodedText" />
+            tools:context=".MainActivity">
 
-        <Button
-            android:id="@+id/btnTest2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Test 2"
-            app:layout_constraintEnd_toEndOf="@+id/btnTest"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/btnTest"
-            app:layout_constraintTop_toBottomOf="@+id/btnTest"
-            tools:ignore="HardcodedText" />
+            <Button
+                android:id="@+id/btnTest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Test 1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="HardcodedText" />
 
-        <Button
-            android:id="@+id/btnTest3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Test 3"
-            app:layout_constraintEnd_toEndOf="@+id/btnTest2"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/btnTest2"
-            app:layout_constraintTop_toBottomOf="@+id/btnTest2"
-            tools:ignore="HardcodedText" />
+            <Button
+                android:id="@+id/btnTest2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Test 2"
+                app:layout_constraintEnd_toEndOf="@+id/btnTest"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/btnTest"
+                app:layout_constraintTop_toBottomOf="@+id/btnTest"
+                tools:ignore="HardcodedText" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/btnTest3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Test 3"
+                app:layout_constraintEnd_toEndOf="@+id/btnTest2"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/btnTest2"
+                app:layout_constraintTop_toBottomOf="@+id/btnTest2"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:id="@+id/btnTest4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Test Square Path"
+                app:layout_constraintEnd_toEndOf="@+id/btnTest3"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/btnTest3"
+                app:layout_constraintTop_toBottomOf="@+id/btnTest3"
+                tools:ignore="HardcodedText" />
+
+
+            <Button
+                android:id="@+id/btnTest5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Test self rotation 90º"
+                app:layout_constraintEnd_toEndOf="@+id/btnTest4"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/btnTest4"
+                app:layout_constraintTop_toBottomOf="@+id/btnTest4"
+                tools:ignore="HardcodedText" />
+
+
+            <Button
+                android:id="@+id/btnTest6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Test self rotation -90º"
+                app:layout_constraintEnd_toEndOf="@+id/btnTest5"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/btnTest5"
+                app:layout_constraintTop_toBottomOf="@+id/btnTest5"
+                tools:ignore="HardcodedText" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 </layout>
