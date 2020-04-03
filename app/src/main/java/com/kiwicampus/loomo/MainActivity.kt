@@ -4,8 +4,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.kiwicampus.loomo.databinding.ActivityMainBinding
+import com.segway.robot.algo.Pose2D
+import com.segway.robot.algo.minicontroller.CheckPoint
+import com.segway.robot.algo.minicontroller.CheckPointStateListener
 import com.segway.robot.sdk.base.bind.ServiceBinder
 import com.segway.robot.sdk.locomotion.sbv.Base
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -22,6 +26,24 @@ class MainActivity : AppCompatActivity() {
     private fun setupLoomoService() {
         loomoBase.bindService(this, object : ServiceBinder.BindStateListener {
             override fun onUnbind(reason: String?) {
+                loomoBase.setOnCheckPointArrivedListener(object : CheckPointStateListener {
+                    override fun onCheckPointMiss(
+                        checkPoint: CheckPoint?,
+                        realPose: Pose2D?,
+                        isLast: Boolean,
+                        reason: Int
+                    ) {
+                        Timber.d("**Missed** Real pose: ${realPose.toString()} -- Checkpoint ${checkPoint.toString()}")
+                    }
+
+                    override fun onCheckPointArrived(
+                        checkPoint: CheckPoint?,
+                        realPose: Pose2D?,
+                        isLast: Boolean
+                    ) {
+                        Timber.d("Real pose: ${realPose.toString()} -- Checkpoint ${checkPoint.toString()}")
+                    }
+                })
             }
 
             override fun onBind() {
@@ -90,6 +112,19 @@ class MainActivity : AppCompatActivity() {
             loomoBase.addCheckPoint(0f, 0f, ((3 * Math.PI) / 2).toFloat())
             loomoBase.addCheckPoint(0f, 0f, ((7 * Math.PI) / 4).toFloat())
             loomoBase.addCheckPoint(0f, 0f, (2 * Math.PI).toFloat())
+        }
+        binding.btnTest7.setOnClickListener {
+            loomoBase.controlMode = Base.CONTROL_MODE_RAW
+            cleanLoomoPose()
+            Timber.d("Initial velocities Linear ${loomoBase.linearVelocity} with a limit ${loomoBase.linearVelocityLimit}")
+            Timber.d("Angular velocitiy ${loomoBase.angularVelocity} with a limit ${loomoBase.angularVelocityLimit}")
+            loomoBase.setLinearVelocity(3f)
+            loomoBase.addCheckPoint(1f, 0f, (Math.PI).toFloat())
+            loomoBase.setAngularVelocity(3f)
+            loomoBase.addCheckPoint(1f, 1f, (Math.PI).toFloat())
+            Timber.d("🔚Final velocities Linear ${loomoBase.linearVelocity} ")
+            Timber.d("Angular velocitiy ${loomoBase.angularVelocity}")
+
         }
     }
 }
