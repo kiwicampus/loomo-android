@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             loomoBase.addCheckPoint(0f, 0f, ((7 * Math.PI) / 4).toFloat())
             loomoBase.addCheckPoint(0f, 0f, (2 * Math.PI).toFloat())
         }
-        binding.btnTest7.setOnClickListener {
+        binding.btnTest8.setOnClickListener {
             loomoBase.controlMode = Base.CONTROL_MODE_RAW
             cleanLoomoPose()
             Timber.d("Initial velocities Linear ${loomoBase.linearVelocity} with a limit ${loomoBase.linearVelocityLimit}")
@@ -124,7 +124,6 @@ class MainActivity : AppCompatActivity() {
             loomoBase.addCheckPoint(1f, 1f, (Math.PI).toFloat())
             Timber.d("🔚Final velocities Linear ${loomoBase.linearVelocity} ")
             Timber.d("Final Angular velocity ${loomoBase.angularVelocity}")
-
         }
     }
 }
