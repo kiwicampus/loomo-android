@@ -3,6 +3,7 @@ package com.kiwicampus.loomo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
 import com.kiwicampus.loomo.databinding.ActivityMainBinding
 import com.segway.robot.algo.Pose2D
 import com.segway.robot.algo.minicontroller.CheckPoint
@@ -13,14 +14,20 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: MainActivityViewModel
     private lateinit var loomoBase: Base
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         loomoBase = Base.getInstance()
+        setupViewModel()
         setupLoomoService()
         setClickListeners()
+    }
+
+    private fun setupViewModel() {
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
     }
 
     private fun setupLoomoService() {
