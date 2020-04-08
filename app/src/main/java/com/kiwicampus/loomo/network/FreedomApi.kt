@@ -1,8 +1,8 @@
 package com.kiwicampus.loomo.network
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import com.kiwicampus.loomo.models.CloudMessage
-import com.kiwicampus.loomo.models.CloudMessageResponse
+import com.kiwicampus.loomo.models.FreedomMessage
+import com.kiwicampus.loomo.models.FreedomResponse
 import com.kiwicampus.loomo.utils.Constants
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
@@ -25,11 +25,11 @@ val retrofit: Retrofit = Retrofit.Builder()
 
 interface FreedomProvider {
     @PUT("accounts/${Constants.FREEDOM_ACCOUNT}/devices/${Constants.FREEDOM_DEVICE}/data")
-    fun sendMessageToCloudAsync(
+    fun sendMessageToFreedomAsync(
         @Header("mc_token") token: String,
         @Header("mc_secret") secret: String,
-        @Body message: List<CloudMessage>
-    ): Deferred<CloudMessageResponse>
+        @Body message: List<FreedomMessage>
+    ): Deferred<FreedomResponse>
 }
 
 object FreedomApi {

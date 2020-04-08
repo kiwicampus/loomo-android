@@ -1,6 +1,6 @@
 package com.kiwicampus.loomo.models
 
-data class CloudMessageResponse(
+data class FreedomResponse(
     val account: String,
     val action: String,
     val device: String,

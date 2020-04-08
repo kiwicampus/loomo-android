@@ -14,7 +14,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context=".MainActivity">
+            tools:context=".views.MainActivity">
 
             <Button
                 android:id="@+id/btnTest"
@@ -121,6 +121,15 @@
                 app:layout_constraintStart_toStartOf="@+id/btnTest7"
                 app:layout_constraintTop_toBottomOf="@+id/btnTest7"
                 tools:ignore="HardcodedText" />
+
+            <ImageView
+                android:id="@+id/ivTestImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@+id/btnTest8"
+                app:layout_constraintStart_toStartOf="@+id/btnTest8"
+                app:layout_constraintTop_toBottomOf="@+id/btnTest8"
+                app:srcCompat="@drawable/test_image" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
