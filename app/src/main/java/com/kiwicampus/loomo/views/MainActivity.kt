@@ -44,9 +44,11 @@ class MainActivity : AppCompatActivity() {
         )
         initLoomo()
         setupViewModel()
-        setupLoomoService()
-        setClickListeners()
         setupPermissions()
+
+        binding.btnBindServices.setOnClickListener {
+            setupLoomoService()
+        }
         binding.btnTestVision.setOnClickListener {
             initLoomoVision()
         }
