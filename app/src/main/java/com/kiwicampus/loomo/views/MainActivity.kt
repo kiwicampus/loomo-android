@@ -47,7 +47,9 @@ class MainActivity : AppCompatActivity() {
         setupLoomoService()
         setClickListeners()
         setupPermissions()
-//        val bitmap = (binding.ivTestImage.drawable as BitmapDrawable).bitmap
+        binding.btnTestVision.setOnClickListener {
+            initLoomoVision()
+        }
     }
 
     private fun initLoomo() {
@@ -115,8 +117,12 @@ class MainActivity : AppCompatActivity() {
         }
         loomoBase.bindService(this, loomoBindService)
         loomoVision.bindService(this, loomoBindService)
+    }
+
+    private fun initLoomoVision() {
         val infos = loomoVision.activatedStreamInfo
 
+        Timber.d("$infos")
         loomoVision.startListenFrame(StreamType.DEPTH) { streamType, frame ->
             // send frame.byteBuffer
             Timber.d("Stream Type: $streamType Resolution: ${frame.info.resolution} Pixel Format: ${frame.info.pixelFormat}")
@@ -129,6 +135,30 @@ class MainActivity : AppCompatActivity() {
         val stream = ByteArrayOutputStream()
         visionBitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
         return stream.toByteArray()
+    }
+
+    private fun setupPermissions() {
+        Dexter.withContext(this).withPermissions(
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                report?.let {
+                    if (report.areAllPermissionsGranted()) setupLocationListener()
+                }
+            }
+
+            override fun onPermissionRationaleShouldBeShown(
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
+            ) {
+                token?.continuePermissionRequest()
+            }
+
+        }).withErrorListener {
+            Toast.makeText(this@MainActivity, it.name, Toast.LENGTH_SHORT).show()
+            Timber.e(it.name)
+        }.check()
     }
 
     private fun cleanLoomoPose() {
@@ -205,30 +235,7 @@ class MainActivity : AppCompatActivity() {
             Timber.d("🔚Final velocities Linear ${loomoBase.linearVelocity} ")
             Timber.d("Final Angular velocity ${loomoBase.angularVelocity}")
         }
+
     }
 
-
-    private fun setupPermissions() {
-        Dexter.withContext(this).withPermissions(
-            android.Manifest.permission.ACCESS_COARSE_LOCATION,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
-        ).withListener(object : MultiplePermissionsListener {
-            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                report?.let {
-                    if (report.areAllPermissionsGranted()) setupLocationListener()
-                }
-            }
-
-            override fun onPermissionRationaleShouldBeShown(
-                permissions: MutableList<PermissionRequest>?,
-                token: PermissionToken?
-            ) {
-                token?.continuePermissionRequest()
-            }
-
-        }).withErrorListener {
-            Toast.makeText(this@MainActivity, it.name, Toast.LENGTH_SHORT).show()
-            Timber.e(it.name)
-        }.check()
-    }
 }

@@ -22,6 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Test 1"
+                android:visibility="gone"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -35,6 +36,7 @@
                 android:text="Test 2"
                 app:layout_constraintEnd_toEndOf="@+id/btnTest"
                 app:layout_constraintLeft_toLeftOf="parent"
+                android:visibility="gone"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/btnTest"
                 app:layout_constraintTop_toBottomOf="@+id/btnTest"
@@ -46,6 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Test 3"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@+id/btnTest2"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -60,6 +63,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Test Square Path"
                 app:layout_constraintEnd_toEndOf="@+id/btnTest3"
+                android:visibility="gone"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/btnTest3"
@@ -72,6 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:visibility="gone"
                 android:text="Test self rotation 90º"
                 app:layout_constraintEnd_toEndOf="@+id/btnTest4"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -87,6 +92,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Test self rotation -90º"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@+id/btnTest5"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -101,6 +107,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Test self multiple rotation"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@+id/btnTest6"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -116,20 +123,28 @@
                 android:layout_marginTop="8dp"
                 android:text="Test Linear/Angular velocities"
                 app:layout_constraintEnd_toEndOf="@+id/btnTest7"
+                android:visibility="gone"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/btnTest7"
                 app:layout_constraintTop_toBottomOf="@+id/btnTest7"
                 tools:ignore="HardcodedText" />
 
-            <ImageView
-                android:id="@+id/ivTestImage"
+
+            <Button
+                android:id="@+id/btnTestVision"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="@+id/btnTest8"
-                app:layout_constraintStart_toStartOf="@+id/btnTest8"
-                app:layout_constraintTop_toBottomOf="@+id/btnTest8"
-                app:srcCompat="@drawable/test_image" />
+                android:layout_marginTop="32dp"
+                android:text="Start vision service"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/btnTest7"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/btnTest7"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="HardcodedText" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
