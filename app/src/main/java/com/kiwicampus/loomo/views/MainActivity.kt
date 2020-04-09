@@ -92,6 +92,7 @@ class MainActivity : AppCompatActivity() {
             android.Manifest.permission.ACCESS_FINE_LOCATION
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                Timber.d("Asking for permissions $report")
                 report?.let {
                     if (report.areAllPermissionsGranted()) setupLocationListener()
                 }
