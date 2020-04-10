@@ -3,6 +3,7 @@ package com.kiwicampus.loomo.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -22,7 +23,6 @@ import com.kiwicampus.loomo.viewmodels.MainActivityViewModel
 import com.segway.robot.sdk.base.bind.ServiceBinder
 import com.segway.robot.sdk.locomotion.sbv.Base
 import com.segway.robot.sdk.vision.Vision
-import com.segway.robot.sdk.vision.stream.StreamType
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 
@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onBind() {
+
             }
         })
     }
@@ -66,24 +67,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initLoomoVision() {
-        val infos = loomoVision.activatedStreamInfo
-        Toast.makeText(this, "Loomo vision initiated", Toast.LENGTH_SHORT).show()
-        Timber.d("$infos")
-        loomoVision.startListenFrame(StreamType.DEPTH) { streamType, frame ->
-            // send frame.byteBuffer
-            Timber.d("Stream Type: $streamType Resolution: ${frame.info.resolution} Pixel Format: ${frame.info.pixelFormat}")
-            try {
-                val bitmap = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888)
-                val stream = ByteArrayOutputStream()
-                bitmap.copyPixelsFromBuffer(frame.byteBuffer)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
-                val byteArray = stream.toByteArray()
-                Timber.d("Byte array length ${byteArray.size}")
-                viewModel.updateVideoImage(byteArray)
-            } catch (e: Exception) {
-                Timber.e(e)
-            }
-        }
+        val bitmap = (binding.ivTest.drawable as BitmapDrawable).bitmap
+//        Timber.d("${bitmap.config} ${bitmap.copy(Bitmap.Config.RGB, true)}")
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        Timber.d("Height:${bitmap.height} Width:${bitmap.width} Byte count:${bitmap.byteCount} Row bytes:${bitmap.rowBytes}")
+        val byteArray = stream.toByteArray()
+        Timber.d("Byte array size: ${byteArray.size}")
+//        Timber.d("${BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)}")
+//        viewModel.updateVideoImage(byteArray, bitmap.height, bitmap.width, bitmap.rowBytes)
+//        val infos = loomoVision.activatedStreamInfo
+//        Toast.makeText(this, "Loomo vision initiated", Toast.LENGTH_SHORT).show()
+//        Timber.d("$infos")
+//        loomoVision.startListenFrame(StreamType.COLOR) { streamType, frame ->
+//            // send frame.byteBuffer
+//            Timber.d("Stream Type: $streamType Resolution: ${frame.info.resolution} Pixel Format: ${frame.info.pixelFormat}")
+//            try {
+//                val bitmap = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888)
+//                val stream = ByteArrayOutputStream()
+//                bitmap.copyPixelsFromBuffer(frame.byteBuffer)
+//                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
+//                val byteArray = stream.toByteArray()
+//                Timber.d("Byte array length ${byteArray.size}")
+//                viewModel.updateVideoImage(byteArray)
+//            } catch (e: Exception) {
+//                Timber.e(e)
+//            }
+//        }
     }
 
     private fun setupPermissions() {

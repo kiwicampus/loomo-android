@@ -6,4 +6,5 @@ data class Image(
     val encoding: String?= null,
     val step: Int?= null,
     @Suppress("ArrayInDataClass") val data: ByteArray
+
 )

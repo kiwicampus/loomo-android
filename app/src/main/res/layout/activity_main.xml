@@ -132,11 +132,11 @@
 
 
             <Button
-                android:id="@+id/btnBindServices"
+                android:id="@+id/btnSendLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:text="Bind loomo services"
+                android:text="Send Default Location"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -150,15 +150,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Start vision service"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/btnBindServices"
+                app:layout_constraintEnd_toEndOf="@+id/btnSendLocation"
                 app:layout_constraintHorizontal_bias="0.502"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/btnBindServices"
-                app:layout_constraintTop_toBottomOf="@+id/btnBindServices"
-                app:layout_constraintVertical_bias="1.0"
+                app:layout_constraintStart_toStartOf="@+id/btnSendLocation"
+                app:layout_constraintTop_toBottomOf="@+id/btnSendLocation"
                 tools:ignore="HardcodedText" />
+
+            <ImageView
+                android:id="@+id/ivTest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="@+id/btnTestVision"
+                app:layout_constraintStart_toStartOf="@+id/btnTestVision"
+                app:layout_constraintTop_toBottomOf="@+id/btnTestVision"
+                app:srcCompat="@drawable/test_image" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
