@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -41,16 +42,17 @@ class MainActivity : AppCompatActivity() {
         initLoomo()
         setupViewModel()
         setupPermissions()
-
+        binding.btnSendLocation.setOnClickListener {
+            viewModel.updateLocation(4.144230, -73.634529)
+        }
         binding.btnTestVision.setOnClickListener {
-            initLoomoVision()
+            loomoBase.controlMode = Base.CONTROL_MODE_RAW
         }
     }
 
     private fun initLoomo() {
-        //loomoBase = Base.getInstance()
-        loomoVision = Vision.getInstance()
-        loomoVision.bindService(this, object : ServiceBinder.BindStateListener {
+        loomoBase = Base.getInstance()
+        loomoBase.bindService(this, object : ServiceBinder.BindStateListener {
             override fun onUnbind(reason: String?) {
 
             }
@@ -64,6 +66,17 @@ class MainActivity : AppCompatActivity() {
     private fun setupViewModel() {
         @Suppress("DEPRECATION")
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+        viewModel.currentCommand.observe(this, Observer {
+            @Suppress("UNNECESSARY_SAFE_CALL")
+            val linearVelocity = (it?.message?.linear?.x ?: 0).toFloat()
+            val angularVelocity = (it?.message?.angular?.z ?: 0).toFloat()
+            binding.tvLinear.text = "$linearVelocity"
+            binding.tvAngular.text = "$angularVelocity"
+            Timber.d("V: $linearVelocity ϴ: $angularVelocity")
+
+            loomoBase.setLinearVelocity(linearVelocity)
+            loomoBase.setAngularVelocity(angularVelocity)
+        })
     }
 
     private fun initLoomoVision() {
@@ -131,7 +144,7 @@ class MainActivity : AppCompatActivity() {
             0.1f,
             object : LocationListener {
                 override fun onLocationChanged(location: Location?) {
-                    Timber.d("Location lat: ${location?.latitude} lon: ${location?.longitude}")
+//                    Timber.d("Location lat: ${location?.latitude} lon: ${location?.longitude}")
                     location?.let {
                         viewModel.updateLocation(it.latitude, it.longitude)
                     }

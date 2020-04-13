@@ -1,8 +1,11 @@
 package com.kiwicampus.loomo.viewmodels
 
 import android.os.Handler
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.kiwicampus.loomo.models.FreedomMessage
+import com.kiwicampus.loomo.models.freedom_command.FreedomCommand
 import com.kiwicampus.loomo.models.ros_objects.Image
 import com.kiwicampus.loomo.models.ros_objects.NavSatFix
 import com.kiwicampus.loomo.network.FreedomApi
@@ -21,6 +24,12 @@ class MainActivityViewModel : ViewModel() {
         observeDeviceCommands()
     }
 
+    private val commandsHistory = mutableListOf<Double>()
+
+    private val _currentCommand = MutableLiveData<FreedomCommand>()
+    val currentCommand: LiveData<FreedomCommand>
+        get() = _currentCommand
+
     private fun observeDeviceCommands() {
         if (runnableCommands == null) {
             runnableCommands = object : Runnable {
@@ -28,7 +37,7 @@ class MainActivityViewModel : ViewModel() {
                     uiScope.launch {
                         getDeviceCommands()
                     }
-                    handler.postDelayed(this, 10000)
+                    handler.postDelayed(this, 1000)
                 }
             }
             runnableCommands?.run()
@@ -43,8 +52,12 @@ class MainActivityViewModel : ViewModel() {
             )
             try {
                 val commands = response.await()
-                if (commands.isNotEmpty()){
-                    Timber.d("Vϴ: ${commands[commands.size - 1].message.angular} , V: ${commands[commands.size - 1].message.linear}")
+                Timber.d("Size: ${commands.size}")
+                commands.forEach { command ->
+                    if (!commandsHistory.contains(command.utc_time)) {
+                        _currentCommand.value = command
+                        commandsHistory.add(command.utc_time)
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e)

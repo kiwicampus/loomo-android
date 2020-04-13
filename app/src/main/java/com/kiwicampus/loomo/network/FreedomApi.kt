@@ -19,10 +19,10 @@ import retrofit2.http.PUT
 val retrofit: Retrofit = Retrofit.Builder()
     .baseUrl(Constants.FREEDOM_BASE_URL)
     .addCallAdapterFactory(CoroutineCallAdapterFactory())
-    .client(OkHttpClient.Builder().addInterceptor(run {
-        val httpLoggingInterceptor = HttpLoggingInterceptor()
-        httpLoggingInterceptor.apply { level = HttpLoggingInterceptor.Level.BODY }
-    }).build())
+//    .client(OkHttpClient.Builder().addInterceptor(run {
+//        val httpLoggingInterceptor = HttpLoggingInterceptor()
+//        httpLoggingInterceptor.apply { level = HttpLoggingInterceptor.Level.BODY }
+//    }).build())
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
