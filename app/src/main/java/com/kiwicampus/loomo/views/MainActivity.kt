@@ -68,8 +68,8 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
         viewModel.currentCommand.observe(this, Observer {
             @Suppress("UNNECESSARY_SAFE_CALL")
-            val linearVelocity = (it?.message?.linear?.x ?: 0).toFloat()
-            val angularVelocity = (it?.message?.angular?.z ?: 0).toFloat()
+            val linearVelocity = it?.message?.linear?.x ?: 0.0f
+            val angularVelocity = it?.message?.angular?.z ?: 0.0f
             binding.tvLinear.text = "$linearVelocity"
             binding.tvAngular.text = "$angularVelocity"
             Timber.d("V: $linearVelocity ϴ: $angularVelocity")
