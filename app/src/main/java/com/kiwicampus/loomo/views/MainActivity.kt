@@ -41,10 +41,8 @@ class MainActivity : AppCompatActivity() {
         )
         initLoomo()
         setupViewModel()
-        setupPermissions()
-        binding.btnSendLocation.setOnClickListener {
-            viewModel.updateLocation(4.144230, -73.634529)
-        }
+//        setupPermissions()
+
         binding.btnTestVision.setOnClickListener {
             loomoBase.controlMode = Base.CONTROL_MODE_RAW
         }

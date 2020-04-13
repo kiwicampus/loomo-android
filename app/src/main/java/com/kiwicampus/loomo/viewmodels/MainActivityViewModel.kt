@@ -19,9 +19,11 @@ class MainActivityViewModel : ViewModel() {
 
     private val handler = Handler()
     private var runnableCommands: Runnable? = null
+    private var runnableDefaultLocation: Runnable? = null
 
     init {
         observeDeviceCommands()
+        sendDemoLocationPeriodically()
     }
 
     private val commandsHistory = mutableListOf<Double>()
@@ -41,6 +43,20 @@ class MainActivityViewModel : ViewModel() {
                 }
             }
             runnableCommands?.run()
+        }
+    }
+
+    private fun sendDemoLocationPeriodically() {
+        if (runnableDefaultLocation == null) {
+            runnableDefaultLocation = object : Runnable {
+                override fun run() {
+                    uiScope.launch {
+                        updateLocation(4.144230, -73.634529)
+                    }
+                    handler.postDelayed(this, 1000)
+                }
+            }
+            runnableDefaultLocation?.run()
         }
     }
 
@@ -66,6 +82,7 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun updateLocation(latitude: Double, longitude: Double) {
+//        Timber.d("Updating default location $latitude, $longitude")
         uiScope.launch {
             sendFreedomMessage(
                 "/location",
