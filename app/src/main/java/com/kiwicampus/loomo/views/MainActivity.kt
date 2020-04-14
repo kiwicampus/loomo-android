@@ -72,8 +72,8 @@ class MainActivity : AppCompatActivity() {
             binding.tvAngular.text = "$angularVelocity"
             Timber.d("V: $linearVelocity ϴ: $angularVelocity")
 
-            loomoBase.setLinearVelocity(linearVelocity)
-            loomoBase.setAngularVelocity(angularVelocity)
+//            loomoBase.setLinearVelocity(linearVelocity)
+//            loomoBase.setAngularVelocity(angularVelocity)
         })
     }
 

@@ -26,12 +26,14 @@ class MainActivityViewModel : ViewModel() {
         sendDemoLocationPeriodically()
     }
 
+    // TODO limit the list size to avoid a huge val
     private val commandsHistory = mutableListOf<Double>()
 
     private val _currentCommand = MutableLiveData<FreedomCommand>()
     val currentCommand: LiveData<FreedomCommand>
         get() = _currentCommand
 
+    // TODO test 5hz requests
     private fun observeDeviceCommands() {
         if (runnableCommands == null) {
             runnableCommands = object : Runnable {
@@ -60,6 +62,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
+    // TODO command no received in 3 seconds set to 0 prevent
     private suspend fun getDeviceCommands() {
         withContext(Dispatchers.Main) {
             val response = FreedomApi.retrofitService.getCommandsAsync(
