@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnTestVision.setOnClickListener {
             loomoBase.controlMode = Base.CONTROL_MODE_RAW
+            loomoBase.setRidingSpeedLimitEnable(true)
+            loomoBase.ridingSpeedLimit = 3f
         }
     }
 
@@ -72,8 +74,8 @@ class MainActivity : AppCompatActivity() {
             binding.tvAngular.text = "$angularVelocity"
             Timber.d("V: $linearVelocity ϴ: $angularVelocity")
 
-//            loomoBase.setLinearVelocity(linearVelocity)
-//            loomoBase.setAngularVelocity(angularVelocity)
+            loomoBase.setLinearVelocity(linearVelocity)
+            loomoBase.setAngularVelocity(angularVelocity)
         })
     }
 

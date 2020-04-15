@@ -20,20 +20,26 @@ class MainActivityViewModel : ViewModel() {
     private val handler = Handler()
     private var runnableCommands: Runnable? = null
     private var runnableDefaultLocation: Runnable? = null
+    private var runnableDefaultImage: Runnable? = null
+
+    // command no received in 3 seconds set to 0 prevent
+    private var runnableStopMovement: Runnable? = null
+    private var lastMovement: Double? = null // timestamp
 
     init {
         observeDeviceCommands()
         sendDemoLocationPeriodically()
+        sendDemoImagePeriodically()
     }
 
-    // TODO limit the list size to avoid a huge val
-    private val commandsHistory = mutableListOf<Double>()
+    // Test limit the list size 100
+    private var commandsHistory = mutableListOf<Double>()
 
     private val _currentCommand = MutableLiveData<FreedomCommand>()
     val currentCommand: LiveData<FreedomCommand>
         get() = _currentCommand
 
-    // TODO test 5hz requests
+    // test 10hz requests
     private fun observeDeviceCommands() {
         if (runnableCommands == null) {
             runnableCommands = object : Runnable {
@@ -41,7 +47,7 @@ class MainActivityViewModel : ViewModel() {
                     uiScope.launch {
                         getDeviceCommands()
                     }
-                    handler.postDelayed(this, 1000)
+                    handler.postDelayed(this, 100)
                 }
             }
             runnableCommands?.run()
@@ -62,7 +68,21 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    // TODO command no received in 3 seconds set to 0 prevent
+
+    private fun sendDemoImagePeriodically() {
+        if (runnableDefaultImage == null) {
+            runnableDefaultImage = object : Runnable {
+                override fun run() {
+                    uiScope.launch {
+                        updateVideoImage(Constants.DEFAULT_IMAGE, 24, 32, 96)
+                    }
+                    handler.postDelayed(this, 1000)
+                }
+            }
+            runnableDefaultImage?.run()
+        }
+    }
+
     private suspend fun getDeviceCommands() {
         withContext(Dispatchers.Main) {
             val response = FreedomApi.retrofitService.getCommandsAsync(
@@ -78,6 +98,9 @@ class MainActivityViewModel : ViewModel() {
                         commandsHistory.add(command.utc_time)
                     }
                 }
+                if (commandsHistory.size > 100) {
+                    commandsHistory = commandsHistory.subList(90, commandsHistory.size)
+                }
             } catch (e: Exception) {
                 Timber.e(e)
             }
@@ -85,7 +108,6 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun updateLocation(latitude: Double, longitude: Double) {
-//        Timber.d("Updating default location $latitude, $longitude")
         uiScope.launch {
             sendFreedomMessage(
                 "/location",
@@ -98,11 +120,10 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun updateVideoImage(bytesImage: ByteArray, height: Int, width: Int, step: Int) {
+    fun updateVideoImage(bytesImage: List<Int>, height: Int, width: Int, step: Int) {
         val image = Image(
-            data = bytesImage, step = step, height = height, width = width, encoding = "rgb16"
+            data = bytesImage, step = step, height = height, width = width, encoding = "bgr8"
         )
-        Timber.d(image.toString())
         uiScope.launch { sendFreedomMessage("/video", "sensor_msgs/Image", image) }
     }
 
@@ -137,7 +158,7 @@ class MainActivityViewModel : ViewModel() {
                 Constants.FREEDOM_SECRET
             )
             try {
-                val messagesResponse = response.await()
+//                val messagesResponse = response.await()
 
             } catch (e: Exception) {
                 Timber.e(e)
@@ -146,9 +167,9 @@ class MainActivityViewModel : ViewModel() {
     }
 
 
-    fun startRunnables() = runnableCommands?.let { runnableCommands?.run() }
+    private fun startRunnables() = runnableCommands?.let { runnableCommands?.run() }
 
-    fun stopRunnables() = runnableCommands?.let { handler.removeCallbacks(it) }
+    private fun stopRunnables() = runnableCommands?.let { handler.removeCallbacks(it) }
 
     override fun onCleared() {
         super.onCleared()
