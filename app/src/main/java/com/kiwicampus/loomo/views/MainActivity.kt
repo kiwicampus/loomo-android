@@ -3,8 +3,6 @@ package com.kiwicampus.loomo.views
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -34,7 +32,6 @@ import com.segway.robot.sdk.vision.Vision
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
-import java.io.ByteArrayOutputStream
 
 class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.PublisherListener {
     private lateinit var binding: ActivityMainBinding
@@ -53,14 +50,64 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         initLoomo()
         setupViewModel()
         setupPermissions()
-        requestPermissions()
 
-        binding.btnTestVision.setOnClickListener {
-            loomoBase.controlMode = Base.CONTROL_MODE_RAW
-            loomoBase.setRidingSpeedLimitEnable(true)
-            loomoBase.ridingSpeedLimit = 3f
-        }
     }
+
+    private fun setupViewModel() {
+        @Suppress("DEPRECATION")
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+        viewModel.currentCommand.observe(this, Observer {
+            @Suppress("UNNECESSARY_SAFE_CALL")
+            val linearVelocity = it?.message?.linear?.x ?: 0.0f
+            val angularVelocity = it?.message?.angular?.z ?: 0.0f
+            binding.tvLinear.text = "$linearVelocity"
+            binding.tvAngular.text = "$angularVelocity"
+            Timber.d("V: $linearVelocity ϴ: $angularVelocity")
+
+            loomoBase.setLinearVelocity(linearVelocity)
+            loomoBase.setAngularVelocity(angularVelocity)
+        })
+    }
+
+    private fun setupPermissions() {
+        setupLocationPermission()
+        setupTokBoxPermissions()
+    }
+
+    private fun initTokbox() {
+        tokboxSession = Session.Builder(this, TOKBOX_API_KEY, TOKBOX_SESSION_ID).build()
+        tokboxSession.setSessionListener(this)
+        tokboxPublisher = Publisher.Builder(this).build()
+        tokboxPublisher.setPublisherListener(this)
+        tokboxSession.connect(TOKBOX_TOKEN)
+    }
+
+    override fun onConnected(p0: Session?) {
+//        tokboxPublisher.capturer = LoomoVideoCapturer(loomoVision)
+        binding.publisherContainer.addView(tokboxPublisher.view)
+        if (tokboxPublisher.view is GLSurfaceView) {
+            (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
+        }
+        tokboxSession.publish(tokboxPublisher)
+    }
+
+//    private fun initLoomoVision() {
+//        loomoVision.startListenFrame(StreamType.COLOR) { streamType, frame ->
+//            // send frame.byteBuffer
+//            Timber.d("Stream Type: $streamType Resolution: ${frame.info.resolution} Pixel Format: ${frame.info.pixelFormat}")
+//            try {
+//                val bitmap = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888)
+//                val stream = ByteArrayOutputStream()
+//                bitmap.copyPixelsFromBuffer(frame.byteBuffer)
+//                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
+//                val byteArray = stream.toByteArray()
+//                Timber.d("Byte array length ${byteArray.size}")
+//                viewModel.updateVideoImage(byteArray)
+//            } catch (e: Exception) {
+//                Timber.e(e)
+//            }
+//        }
+//    }
 
     private fun initLoomo() {
         loomoBase = Base.getInstance()
@@ -85,53 +132,23 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         })
     }
 
-    private fun setupViewModel() {
-        @Suppress("DEPRECATION")
-        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
-        viewModel.currentCommand.observe(this, Observer {
-            @Suppress("UNNECESSARY_SAFE_CALL")
-            val linearVelocity = it?.message?.linear?.x ?: 0.0f
-            val angularVelocity = it?.message?.angular?.z ?: 0.0f
-            binding.tvLinear.text = "$linearVelocity"
-            binding.tvAngular.text = "$angularVelocity"
-            Timber.d("V: $linearVelocity ϴ: $angularVelocity")
-
-            loomoBase.setLinearVelocity(linearVelocity)
-            loomoBase.setAngularVelocity(angularVelocity)
-        })
+    @AfterPermissionGranted(RC_VIDEO_APP_PERM)
+    private fun setupTokBoxPermissions() {
+        val perms = arrayOf(
+            Manifest.permission.INTERNET,
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        )
+        if (EasyPermissions.hasPermissions(this, *perms)) {
+            initTokbox()
+        } else {
+            val message = "This app needs access to your camera and mic to make video transmission"
+            EasyPermissions.requestPermissions(this, message, RC_VIDEO_APP_PERM, *perms)
+        }
     }
 
-    private fun initLoomoVision() {
-        val bitmap = (binding.ivTest.drawable as BitmapDrawable).bitmap
-//        Timber.d("${bitmap.config} ${bitmap.copy(Bitmap.Config.RGB, true)}")
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-        Timber.d("Height:${bitmap.height} Width:${bitmap.width} Byte count:${bitmap.byteCount} Row bytes:${bitmap.rowBytes}")
-        val byteArray = stream.toByteArray()
-        Timber.d("Byte array size: ${byteArray.size}")
-//        Timber.d("${BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)}")
-//        viewModel.updateVideoImage(byteArray, bitmap.height, bitmap.width, bitmap.rowBytes)
-//        val infos = loomoVision.activatedStreamInfo
-//        Toast.makeText(this, "Loomo vision initiated", Toast.LENGTH_SHORT).show()
-//        Timber.d("$infos")
-//        loomoVision.startListenFrame(StreamType.COLOR) { streamType, frame ->
-//            // send frame.byteBuffer
-//            Timber.d("Stream Type: $streamType Resolution: ${frame.info.resolution} Pixel Format: ${frame.info.pixelFormat}")
-//            try {
-//                val bitmap = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888)
-//                val stream = ByteArrayOutputStream()
-//                bitmap.copyPixelsFromBuffer(frame.byteBuffer)
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
-//                val byteArray = stream.toByteArray()
-//                Timber.d("Byte array length ${byteArray.size}")
-//                viewModel.updateVideoImage(byteArray)
-//            } catch (e: Exception) {
-//                Timber.e(e)
-//            }
-//        }
-    }
 
-    private fun setupPermissions() {
+    private fun setupLocationPermission() {
         Dexter.withContext(this).withPermissions(
             Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION
         ).withListener(object : MultiplePermissionsListener {
@@ -153,38 +170,6 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
             Timber.e(it.name)
         }.check()
     }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
-    }
-
-    @AfterPermissionGranted(RC_VIDEO_APP_PERM)
-    private fun requestPermissions() {
-        val perms = arrayOf(
-            Manifest.permission.INTERNET,
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-        )
-        if (EasyPermissions.hasPermissions(this, *perms)) {
-            // initialize view objects from your layout
-
-            tokboxSession = Session.Builder(this, TOKBOX_API_KEY, TOKBOX_SESSION_ID).build()
-            tokboxSession.setSessionListener(this)
-            tokboxSession.connect(TOKBOX_TOKEN)
-
-
-            // initialize and connect to the session
-        } else {
-            val message = "This app needs access to your camera and mic to make video transmission"
-            EasyPermissions.requestPermissions(this, message, RC_VIDEO_APP_PERM, *perms)
-        }
-    }
-
 
     @SuppressLint("MissingPermission")
     private fun setupLocationListener() {
@@ -220,16 +205,6 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
     override fun onStreamReceived(p0: Session?, p1: Stream?) {
     }
 
-    override fun onConnected(p0: Session?) {
-        tokboxPublisher = Publisher.Builder(this).build()
-        tokboxPublisher.setPublisherListener(this)
-//        tokboxPublisher.capturer = LoomoVideoCapturer(loomoVision)
-        binding.publisherContainer.addView(tokboxPublisher.view)
-        if (tokboxPublisher.view is GLSurfaceView) {
-            (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
-        }
-        tokboxSession.publish(tokboxPublisher)
-    }
 
     override fun onDisconnected(p0: Session?) {
     }
@@ -247,81 +222,14 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
 
     }
 
-//    private fun cleanLoomoPose() {
-//        // clean loomo position
-//        loomoBase.cleanOriginalPoint()
-//        // get actual loomo position
-//        val pose = loomoBase.getOdometryPose(-1)
-//        // set initial position to loomo
-//        loomoBase.setOriginalPoint(pose)
-//    }
-//
-//    private fun initLoomoNavigation() {
-//        loomoBase.controlMode = Base.CONTROL_MODE_NAVIGATION
-//        cleanLoomoPose()
-//    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
 
-//    private fun setClickListeners() {
-//        binding.btnTest.setOnClickListener {
-//            initLoomoNavigation()
-//            // works like a coordinate system
-//            // starts in 0, 0
-//            // x coordinate --> vertically
-//            // y coordinate --> horizontally
-//            // 1f, 0f means 1 meter front 0 horizontally
-//            loomoBase.addCheckPoint(1f, 0f)
-//            // 1f, 1f means 1 meter front (already taken) 1 horizontally,
-//            loomoBase.addCheckPoint(1f, 1f, (Math.PI / 2).toFloat())
-//        }
-//        binding.btnTest2.setOnClickListener {
-//            initLoomoNavigation()
-//            loomoBase.addCheckPoint(1f, 0f, (2 * Math.PI).toFloat())
-//        }
-//        binding.btnTest3.setOnClickListener {
-//            initLoomoNavigation()
-//            loomoBase.addCheckPoint(1f, 0f)
-//            loomoBase.addCheckPoint(1f, 0.5f, (-Math.PI).toFloat())
-//            loomoBase.addCheckPoint(2f, 0.5f, (2 * Math.PI).toFloat())
-//        }
-//        binding.btnTest4.setOnClickListener {
-//            initLoomoNavigation()
-//            loomoBase.addCheckPoint(1f, 0f)
-//            loomoBase.addCheckPoint(1f, 1f)
-//            loomoBase.addCheckPoint(0f, 1f)
-//            loomoBase.addCheckPoint(0f, 0f)
-//        }
-//        binding.btnTest5.setOnClickListener {
-//            initLoomoNavigation()
-//            loomoBase.addCheckPoint(0f, 0f, (Math.PI / 2).toFloat())
-//        }
-//        binding.btnTest6.setOnClickListener {
-//            initLoomoNavigation()
-//            loomoBase.addCheckPoint(0f, 0f, (-Math.PI / 2).toFloat())
-//        }
-//        binding.btnTest7.setOnClickListener {
-//            initLoomoNavigation()
-//            loomoBase.addCheckPoint(0f, 0f, (Math.PI / 4).toFloat())
-//            loomoBase.addCheckPoint(0f, 0f, (Math.PI / 2).toFloat())
-//            loomoBase.addCheckPoint(0f, 0f, ((3 * Math.PI) / 4).toFloat())
-//            loomoBase.addCheckPoint(0f, 0f, (Math.PI).toFloat())
-//            loomoBase.addCheckPoint(0f, 0f, ((5 * Math.PI) / 4).toFloat())
-//            loomoBase.addCheckPoint(0f, 0f, ((3 * Math.PI) / 2).toFloat())
-//            loomoBase.addCheckPoint(0f, 0f, ((7 * Math.PI) / 4).toFloat())
-//            loomoBase.addCheckPoint(0f, 0f, (2 * Math.PI).toFloat())
-//        }
-//        binding.btnTest8.setOnClickListener {
-//            loomoBase.controlMode = Base.CONTROL_MODE_RAW
-//            cleanLoomoPose()
-//            Timber.d("Initial velocities Linear ${loomoBase.linearVelocity} with a limit ${loomoBase.linearVelocityLimit}")
-//            Timber.d("Angular velocitiy ${loomoBase.angularVelocity} with a limit ${loomoBase.angularVelocityLimit}")
-//            loomoBase.setLinearVelocity(3f)
-//            loomoBase.addCheckPoint(1f, 0f, (Math.PI).toFloat())
-//            loomoBase.setAngularVelocity(3f)
-//            loomoBase.addCheckPoint(1f, 1f, (Math.PI).toFloat())
-//            Timber.d("🔚Final velocities Linear ${loomoBase.linearVelocity} ")
-//            Timber.d("Final Angular velocity ${loomoBase.angularVelocity}")
-//        }
-//
-//    }
 
 }

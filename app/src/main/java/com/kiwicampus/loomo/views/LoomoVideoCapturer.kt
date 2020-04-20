@@ -1,6 +1,5 @@
 package com.kiwicampus.loomo.views
 
-import android.os.Handler
 import android.view.Surface
 import com.opentok.android.BaseVideoCapturer
 import com.segway.robot.sdk.vision.Vision
