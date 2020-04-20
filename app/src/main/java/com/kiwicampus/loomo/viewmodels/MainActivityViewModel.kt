@@ -26,11 +26,11 @@ class MainActivityViewModel : ViewModel() {
     private var runnableStopMovement: Runnable? = null
     private var lastMovement: Double? = null // timestamp
 
-    init {
-        observeDeviceCommands()
-        sendDemoLocationPeriodically()
-        sendDemoImagePeriodically()
-    }
+//    init {
+//        observeDeviceCommands()
+//        sendDemoLocationPeriodically()
+//        sendDemoImagePeriodically()
+//    }
 
     // Test limit the list size 100
     private var commandsHistory = mutableListOf<Double>()
@@ -74,7 +74,7 @@ class MainActivityViewModel : ViewModel() {
             runnableDefaultImage = object : Runnable {
                 override fun run() {
                     uiScope.launch {
-                        updateVideoImage(Constants.DEFAULT_IMAGE, 24, 32, 96)
+//                        updateVideoImage(Constants.DEFAULT_IMAGE, 24, 32, 96)
                     }
                     handler.postDelayed(this, 1000)
                 }

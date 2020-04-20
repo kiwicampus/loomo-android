@@ -1,5 +1,6 @@
 package com.kiwicampus.loomo.views
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,18 +22,27 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.kiwicampus.loomo.R
 import com.kiwicampus.loomo.databinding.ActivityMainBinding
+import com.kiwicampus.loomo.utils.Constants.Companion.RC_VIDEO_APP_PERM
+import com.kiwicampus.loomo.utils.Constants.Companion.TOKBOX_API_KEY
+import com.kiwicampus.loomo.utils.Constants.Companion.TOKBOX_SESSION_ID
+import com.kiwicampus.loomo.utils.Constants.Companion.TOKBOX_TOKEN
 import com.kiwicampus.loomo.viewmodels.MainActivityViewModel
+import com.opentok.android.*
 import com.segway.robot.sdk.base.bind.ServiceBinder
 import com.segway.robot.sdk.locomotion.sbv.Base
 import com.segway.robot.sdk.vision.Vision
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.PublisherListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
     private lateinit var loomoBase: Base
     private lateinit var loomoVision: Vision
+    private lateinit var tokboxSession: Session
+    private lateinit var tokboxPublisher: Publisher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +52,8 @@ class MainActivity : AppCompatActivity() {
         )
         initLoomo()
         setupViewModel()
-//        setupPermissions()
+        setupPermissions()
+        requestPermissions()
 
         binding.btnTestVision.setOnClickListener {
             loomoBase.controlMode = Base.CONTROL_MODE_RAW
@@ -53,6 +65,16 @@ class MainActivity : AppCompatActivity() {
     private fun initLoomo() {
         loomoBase = Base.getInstance()
         loomoBase.bindService(this, object : ServiceBinder.BindStateListener {
+            override fun onUnbind(reason: String?) {
+
+            }
+
+            override fun onBind() {
+
+            }
+        })
+        loomoVision = Vision.getInstance()
+        loomoVision.bindService(this, object : ServiceBinder.BindStateListener {
             override fun onUnbind(reason: String?) {
 
             }
@@ -111,11 +133,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupPermissions() {
         Dexter.withContext(this).withPermissions(
-            android.Manifest.permission.ACCESS_COARSE_LOCATION,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                Timber.d("Asking for permissions $report")
                 report?.let {
                     if (report.areAllPermissionsGranted()) setupLocationListener()
                 }
@@ -132,6 +152,37 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, it.name, Toast.LENGTH_SHORT).show()
             Timber.e(it.name)
         }.check()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    @AfterPermissionGranted(RC_VIDEO_APP_PERM)
+    private fun requestPermissions() {
+        val perms = arrayOf(
+            Manifest.permission.INTERNET,
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        )
+        if (EasyPermissions.hasPermissions(this, *perms)) {
+            // initialize view objects from your layout
+
+            tokboxSession = Session.Builder(this, TOKBOX_API_KEY, TOKBOX_SESSION_ID).build()
+            tokboxSession.setSessionListener(this)
+            tokboxSession.connect(TOKBOX_TOKEN)
+
+
+            // initialize and connect to the session
+        } else {
+            val message = "This app needs access to your camera and mic to make video transmission"
+            EasyPermissions.requestPermissions(this, message, RC_VIDEO_APP_PERM, *perms)
+        }
     }
 
 
@@ -162,6 +213,39 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
+    override fun onStreamDropped(p0: Session?, p1: Stream?) {
+
+    }
+
+    override fun onStreamReceived(p0: Session?, p1: Stream?) {
+    }
+
+    override fun onConnected(p0: Session?) {
+        tokboxPublisher = Publisher.Builder(this).build()
+        tokboxPublisher.setPublisherListener(this)
+//        tokboxPublisher.capturer = LoomoVideoCapturer(loomoVision)
+        binding.publisherContainer.addView(tokboxPublisher.view)
+        if (tokboxPublisher.view is GLSurfaceView) {
+            (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
+        }
+        tokboxSession.publish(tokboxPublisher)
+    }
+
+    override fun onDisconnected(p0: Session?) {
+    }
+
+    override fun onError(p0: Session?, p1: OpentokError?) {
+    }
+
+    override fun onStreamCreated(p0: PublisherKit?, p1: Stream?) {
+    }
+
+    override fun onStreamDestroyed(p0: PublisherKit?, p1: Stream?) {
+    }
+
+    override fun onError(p0: PublisherKit?, p1: OpentokError?) {
+
+    }
 
 //    private fun cleanLoomoPose() {
 //        // clean loomo position

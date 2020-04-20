@@ -20,7 +20,7 @@ allprojects {
         google()
         jcenter()
         maven { url "https://dl.bintray.com/soywiz/soywiz" }
-
+        maven { url 'https://tokbox.bintray.com/maven' }
     }
 }
 

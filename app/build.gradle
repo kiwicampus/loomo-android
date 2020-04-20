@@ -73,4 +73,8 @@ dependencies {
     implementation 'com.segway.robot:mobile-connectivity-sdk:0.5.104'
     implementation 'com.segway.robot:emoji:0.1.28'
     implementation 'com.segway.robot:support-lib:1.1.2'
+
+    implementation 'com.opentok.android:opentok-android-sdk:2.16.5'
+    implementation 'pub.devrel:easypermissions:3.0.0'
+
 }
