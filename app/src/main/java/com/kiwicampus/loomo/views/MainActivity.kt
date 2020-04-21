@@ -50,7 +50,15 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         initLoomo()
         setupViewModel()
         setupPermissions()
-
+        binding.btnStartPublishing.setOnClickListener {
+            Timber.d("Stream Info init ${loomoVision.activatedStreamInfo}") // call required
+            tokboxPublisher.capturer = LoomoVideoCapturer(loomoVision)
+            binding.publisherContainer.addView(tokboxPublisher.view)
+            if (tokboxPublisher.view is GLSurfaceView) {
+                (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
+            }
+            tokboxSession.publish(tokboxPublisher)
+        }
     }
 
     private fun setupViewModel() {
@@ -83,12 +91,11 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
     }
 
     override fun onConnected(p0: Session?) {
-//        tokboxPublisher.capturer = LoomoVideoCapturer(loomoVision)
-        binding.publisherContainer.addView(tokboxPublisher.view)
-        if (tokboxPublisher.view is GLSurfaceView) {
-            (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
-        }
-        tokboxSession.publish(tokboxPublisher)
+//        binding.publisherContainer.addView(tokboxPublisher.view)
+//        if (tokboxPublisher.view is GLSurfaceView) {
+//            (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
+//        }
+//        tokboxSession.publish(tokboxPublisher)
     }
 
 //    private fun initLoomoVision() {

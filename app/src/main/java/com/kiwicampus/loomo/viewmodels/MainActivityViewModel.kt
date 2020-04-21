@@ -20,17 +20,15 @@ class MainActivityViewModel : ViewModel() {
     private val handler = Handler()
     private var runnableCommands: Runnable? = null
     private var runnableDefaultLocation: Runnable? = null
-    private var runnableDefaultImage: Runnable? = null
 
     // command no received in 3 seconds set to 0 prevent
-    private var runnableStopMovement: Runnable? = null
-    private var lastMovement: Double? = null // timestamp
+//    private var runnableStopMovement: Runnable? = null
+//    private var lastMovement: Double? = null // timestamp
 
-//    init {
-//        observeDeviceCommands()
-//        sendDemoLocationPeriodically()
-//        sendDemoImagePeriodically()
-//    }
+    init {
+        observeDeviceCommands()
+        sendDemoLocationPeriodically()
+    }
 
     // Test limit the list size 100
     private var commandsHistory = mutableListOf<Double>()
@@ -65,21 +63,6 @@ class MainActivityViewModel : ViewModel() {
                 }
             }
             runnableDefaultLocation?.run()
-        }
-    }
-
-
-    private fun sendDemoImagePeriodically() {
-        if (runnableDefaultImage == null) {
-            runnableDefaultImage = object : Runnable {
-                override fun run() {
-                    uiScope.launch {
-//                        updateVideoImage(Constants.DEFAULT_IMAGE, 24, 32, 96)
-                    }
-                    handler.postDelayed(this, 1000)
-                }
-            }
-            runnableDefaultImage?.run()
         }
     }
 
