@@ -27,6 +27,7 @@ import com.kiwicampus.loomo.utils.Constants.Companion.TOKBOX_TOKEN
 import com.kiwicampus.loomo.viewmodels.MainActivityViewModel
 import com.opentok.android.*
 import com.segway.robot.sdk.base.bind.ServiceBinder
+import com.segway.robot.sdk.locomotion.head.Head
 import com.segway.robot.sdk.locomotion.sbv.Base
 import com.segway.robot.sdk.vision.Vision
 import pub.devrel.easypermissions.AfterPermissionGranted
@@ -36,8 +37,11 @@ import timber.log.Timber
 class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.PublisherListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
+
     private lateinit var loomoBase: Base
     private lateinit var loomoVision: Vision
+    private lateinit var loomoHead: Head
+
     private lateinit var tokboxSession: Session
     private lateinit var tokboxPublisher: Publisher
 
@@ -51,6 +55,7 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         setupViewModel()
         setupPermissions()
         binding.btnStartPublishing.setOnClickListener {
+            setupLoomoHead()
             Timber.d("Stream Info init ${loomoVision.activatedStreamInfo}") // call required
             tokboxPublisher.capturer = LoomoVideoCapturer(loomoVision)
             binding.publisherContainer.addView(tokboxPublisher.view)
@@ -88,6 +93,12 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         tokboxPublisher = Publisher.Builder(this).build()
         tokboxPublisher.setPublisherListener(this)
         tokboxSession.connect(TOKBOX_TOKEN)
+    }
+
+    private fun setupLoomoHead(){
+        loomoHead.mode = Head.MODE_ORIENTATION_LOCK
+        loomoHead.setYawAngularVelocity(0f) // horizontal
+        loomoHead.setPitchAngularVelocity(0f) // vertical TODO test maybe some -15
     }
 
     override fun onConnected(p0: Session?) {
@@ -129,6 +140,16 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         })
         loomoVision = Vision.getInstance()
         loomoVision.bindService(this, object : ServiceBinder.BindStateListener {
+            override fun onUnbind(reason: String?) {
+
+            }
+
+            override fun onBind() {
+
+            }
+        })
+        loomoHead = Head.getInstance()
+        loomoHead.bindService(this, object : ServiceBinder.BindStateListener {
             override fun onUnbind(reason: String?) {
 
             }
