@@ -26,8 +26,8 @@ class MainActivityViewModel : ViewModel() {
 //    private var lastMovement: Double? = null // timestamp
 
     init {
-        observeDeviceCommands()
-        sendDemoLocationPeriodically()
+//        observeDeviceCommands()
+//        sendDemoLocationPeriodically()
     }
 
     // Test limit the list size 100

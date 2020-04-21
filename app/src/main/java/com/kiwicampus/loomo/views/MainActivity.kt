@@ -102,11 +102,11 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
     }
 
     override fun onConnected(p0: Session?) {
-//        binding.publisherContainer.addView(tokboxPublisher.view)
-//        if (tokboxPublisher.view is GLSurfaceView) {
-//            (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
-//        }
-//        tokboxSession.publish(tokboxPublisher)
+        binding.publisherContainer.addView(tokboxPublisher.view)
+        if (tokboxPublisher.view is GLSurfaceView) {
+            (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
+        }
+        tokboxSession.publish(tokboxPublisher)
     }
 
 //    private fun initLoomoVision() {
@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
                 override fun onLocationChanged(location: Location?) {
 //                    Timber.d("Location lat: ${location?.latitude} lon: ${location?.longitude}")
                     location?.let {
-                        viewModel.updateLocation(it.latitude, it.longitude)
+//                        viewModel.updateLocation(it.latitude, it.longitude)
                     }
                 }
 
@@ -238,6 +238,7 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
     }
 
     override fun onError(p0: Session?, p1: OpentokError?) {
+        Timber.e(p1?.message)
     }
 
     override fun onStreamCreated(p0: PublisherKit?, p1: Stream?) {
@@ -247,7 +248,7 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
     }
 
     override fun onError(p0: PublisherKit?, p1: OpentokError?) {
-
+        Timber.e(p1?.message)
     }
 
     override fun onRequestPermissionsResult(
