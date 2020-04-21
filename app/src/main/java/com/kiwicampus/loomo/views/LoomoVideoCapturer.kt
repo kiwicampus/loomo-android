@@ -11,7 +11,7 @@ class LoomoVideoCapturer(private val loomoVision: Vision) : BaseVideoCapturer() 
     private var mCapturerHasStarted = false
     private var capturerIsPaused = false
     private lateinit var mCapturerSettings: CaptureSettings
-    private val mWidth = 640 // TODO TEST 320 x 240
+    private val mWidth = 640
     private val mHeight = 480
 
 
@@ -22,10 +22,10 @@ class LoomoVideoCapturer(private val loomoVision: Vision) : BaseVideoCapturer() 
         mCapturerSettings = CaptureSettings()
         mCapturerSettings.height = mHeight
         mCapturerSettings.width = mWidth
-        mCapturerSettings.format = BaseVideoCapturer.ARGB // TODO test bytes formats
+        mCapturerSettings.format = BaseVideoCapturer.MJPEG
         // Test YUY2 15, 30 ,60
         // https://www.intel.com/content/dam/support/us/en/documents/emerging-technologies/intel-realsense-technology/ZR300-Product-Datasheet-Public.pdf
-        mCapturerSettings.fps = 15 // TODO test from Intel RealSense ZR300 docs
+        mCapturerSettings.fps = 15
         mCapturerSettings.expectedDelay = 0
     }
 
@@ -33,7 +33,6 @@ class LoomoVideoCapturer(private val loomoVision: Vision) : BaseVideoCapturer() 
         loomoVision.startListenFrame(StreamType.COLOR) { streamType, frame ->
             Timber.d("Stream Type: $streamType Resolution: ${frame.info.resolution} Pixel Format: ${frame.info.pixelFormat}")
             try {
-                // TODO test first to bitmap before providing buffer
 //                val bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888)
 //                val stream = ByteArrayOutputStream()
 //                bitmap.copyPixelsFromBuffer(frame.byteBuffer)
@@ -42,7 +41,7 @@ class LoomoVideoCapturer(private val loomoVision: Vision) : BaseVideoCapturer() 
 //                provideByteArrayFrame(byteArray, ARGB, mWidth, mHeight, Surface.ROTATION_0, false)
                 provideBufferFrame(
                     frame.byteBuffer,
-                    ARGB,
+                    MJPEG,
                     mWidth,
                     mHeight,
                     Surface.ROTATION_0,
