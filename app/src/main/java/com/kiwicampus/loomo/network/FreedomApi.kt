@@ -7,8 +7,6 @@ import com.kiwicampus.loomo.models.freedom_command.FreedomCommand
 import com.kiwicampus.loomo.models.freedom_message_history.FreedomMessagesReceived
 import com.kiwicampus.loomo.utils.Constants
 import kotlinx.coroutines.Deferred
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -27,7 +25,7 @@ val retrofit: Retrofit = Retrofit.Builder()
     .build()
 
 interface FreedomProvider {
-    @PUT("accounts/${Constants.FREEDOM_ACCOUNT}/devices/${Constants.FREEDOM_DEVICE_DEV}/data")
+    @PUT("accounts/${Constants.FREEDOM_ACCOUNT}/devices/${Constants.FREEDOM_DEVICE}/data")
     fun sendMessageToFreedomAsync(
         @Header("mc_token") token: String,
         @Header("mc_secret") secret: String,
@@ -35,13 +33,13 @@ interface FreedomProvider {
     ): Deferred<FreedomResponse>
 
     // Retrieve messages sent from the device
-    @GET("accounts/${Constants.FREEDOM_ACCOUNT}/devices/${Constants.FREEDOM_DEVICE_DEV}/data?utc_start=-2m&pagination=true")
+    @GET("accounts/${Constants.FREEDOM_ACCOUNT}/devices/${Constants.FREEDOM_DEVICE}/data?utc_start=-2m&pagination=true")
     fun getDeviceMessagesHistoryAsync(
         @Header("mc_token") token: String,
         @Header("mc_secret") secret: String
     ): Deferred<FreedomMessagesReceived>
 
-    @GET("accounts/${Constants.FREEDOM_ACCOUNT}/devices/${Constants.FREEDOM_DEVICE_DEV}/commands")
+    @GET("accounts/${Constants.FREEDOM_ACCOUNT}/devices/${Constants.FREEDOM_DEVICE}/commands")
     fun getCommandsAsync(
         @Header("mc_token") token: String,
         @Header("mc_secret") secret: String

@@ -8,7 +8,6 @@ data class Image(
     val encoding: String? = null,
     val step: Int? = null,
     @SerializedName("is_bigendian") val isBigEndian: Int = 0, // bool false
-//    @Suppress("ArrayInDataClass") val data: ByteArray
-    val data: List<Int>
+    @Suppress("ArrayInDataClass") val data: ByteArray
 
 )

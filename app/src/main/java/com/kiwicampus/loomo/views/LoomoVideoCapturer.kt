@@ -22,7 +22,7 @@ class LoomoVideoCapturer(private val loomoVision: Vision) : BaseVideoCapturer() 
         mCapturerSettings = CaptureSettings()
         mCapturerSettings.height = mHeight
         mCapturerSettings.width = mWidth
-        mCapturerSettings.format = BaseVideoCapturer.MJPEG
+        mCapturerSettings.format = MJPEG
         // Test YUY2 15, 30 ,60
         // https://www.intel.com/content/dam/support/us/en/documents/emerging-technologies/intel-realsense-technology/ZR300-Product-Datasheet-Public.pdf
         mCapturerSettings.fps = 15
@@ -30,22 +30,11 @@ class LoomoVideoCapturer(private val loomoVision: Vision) : BaseVideoCapturer() 
     }
 
     private fun initLoomoVision() {
-        loomoVision.startListenFrame(StreamType.COLOR) { streamType, frame ->
-            Timber.d("Stream Type: $streamType Resolution: ${frame.info.resolution} Pixel Format: ${frame.info.pixelFormat}")
+        loomoVision.startListenFrame(StreamType.COLOR) { _, frame ->
+//            Timber.d("Stream Type: $_ Resolution: ${frame.info.resolution} Pixel Format: ${frame.info.pixelFormat}")
             try {
-//                val bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888)
-//                val stream = ByteArrayOutputStream()
-//                bitmap.copyPixelsFromBuffer(frame.byteBuffer)
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
-//                val byteArray = stream.toByteArray()
-//                provideByteArrayFrame(byteArray, ARGB, mWidth, mHeight, Surface.ROTATION_0, false)
                 provideBufferFrame(
-                    frame.byteBuffer,
-                    MJPEG,
-                    mWidth,
-                    mHeight,
-                    Surface.ROTATION_0,
-                    false
+                    frame.byteBuffer, MJPEG, mWidth, mHeight, Surface.ROTATION_0, false
                 )
             } catch (e: Exception) {
                 Timber.e(e)

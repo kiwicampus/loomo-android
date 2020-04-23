@@ -21,23 +21,17 @@ class MainActivityViewModel : ViewModel() {
     private var runnableCommands: Runnable? = null
     private var runnableDefaultLocation: Runnable? = null
 
-    // command no received in 3 seconds set to 0 prevent
-//    private var runnableStopMovement: Runnable? = null
-//    private var lastMovement: Double? = null // timestamp
-
     init {
-//        observeDeviceCommands()
-//        sendDemoLocationPeriodically()
+        observeDeviceCommands()
+        sendDemoLocationPeriodically()
     }
 
-    // Test limit the list size 100
     private var commandsHistory = mutableListOf<Double>()
 
     private val _currentCommand = MutableLiveData<FreedomCommand>()
     val currentCommand: LiveData<FreedomCommand>
         get() = _currentCommand
 
-    // test 10hz requests
     private fun observeDeviceCommands() {
         if (runnableCommands == null) {
             runnableCommands = object : Runnable {
@@ -74,7 +68,6 @@ class MainActivityViewModel : ViewModel() {
             )
             try {
                 val commands = response.await()
-                Timber.d("Size: ${commands.size}")
                 commands.forEach { command ->
                     if (!commandsHistory.contains(command.utc_time)) {
                         _currentCommand.value = command
@@ -85,6 +78,8 @@ class MainActivityViewModel : ViewModel() {
                     commandsHistory = commandsHistory.subList(90, commandsHistory.size)
                 }
             } catch (e: Exception) {
+                Timber.d("Exception getting device commands ... Stopping runnables")
+                stopRunnables()
                 Timber.e(e)
             }
         }
@@ -103,7 +98,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun updateVideoImage(bytesImage: List<Int>, height: Int, width: Int, step: Int) {
+    fun updateVideoImage(bytesImage: ByteArray, height: Int, width: Int, step: Int) {
         val image = Image(
             data = bytesImage, step = step, height = height, width = width, encoding = "bgr8"
         )
@@ -126,33 +121,24 @@ class MainActivityViewModel : ViewModel() {
 
             try {
                 response.await()
-//                Timber.d(response.await().toString())
             } catch (e: Exception) {
+                Timber.d("Exception sending freedom message ... Stopping runnables")
+                stopRunnables()
                 Timber.e(e)
             }
 
         }
     }
 
-    private suspend fun getDeviceSentMessagesHistory() {
-        withContext(Dispatchers.Main) {
-            val response = FreedomApi.retrofitService.getDeviceMessagesHistoryAsync(
-                Constants.FREEDOM_TOKEN,
-                Constants.FREEDOM_SECRET
-            )
-            try {
-//                val messagesResponse = response.await()
+//    private fun startRunnables() {
+//        runnableDefaultLocation?.run()
+//        runnableCommands?.run()
+//    }
 
-            } catch (e: Exception) {
-                Timber.e(e)
-            }
-        }
+    private fun stopRunnables() {
+        runnableDefaultLocation?.let { handler.removeCallbacks(it) }
+        runnableCommands?.let { handler.removeCallbacks(it) }
     }
-
-
-    private fun startRunnables() = runnableCommands?.let { runnableCommands?.run() }
-
-    private fun stopRunnables() = runnableCommands?.let { handler.removeCallbacks(it) }
 
     override fun onCleared() {
         super.onCleared()

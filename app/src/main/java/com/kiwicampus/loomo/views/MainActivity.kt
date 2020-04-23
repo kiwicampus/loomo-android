@@ -12,7 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -54,40 +54,49 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         initLoomo()
         setupViewModel()
         setupPermissions()
+
         binding.btnStartPublishing.setOnClickListener {
-            setupLoomoHead()
-            Timber.d("Stream Info init ${loomoVision.activatedStreamInfo}") // call required
+            /* Loomo SDK's are not ready automatically that's why the use of a button is useful
+            * tokboxPublisher.capturer = LoomoVideoCapturer(loomoVision) this lines explicitly says
+            * to TokBox sdk from where to get the video
+            * */
+            setStaticLoomoHead()
+            loomoVision.activatedStreamInfo // call required by Loomo SDK
+            @Suppress("DEPRECATION")
             tokboxPublisher.capturer = LoomoVideoCapturer(loomoVision)
-            binding.publisherContainer.addView(tokboxPublisher.view)
-            if (tokboxPublisher.view is GLSurfaceView) {
-                (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
-            }
-            tokboxSession.publish(tokboxPublisher)
+            publishVideoToTokbox()
         }
     }
 
     private fun setupViewModel() {
-        @Suppress("DEPRECATION")
-        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         viewModel.currentCommand.observe(this, Observer {
-            @Suppress("UNNECESSARY_SAFE_CALL")
+            /* Make sure if using a real Loomo you uncomment the set velocities code, otherwise the
+            * commands received won't have effect
+            * */
             val linearVelocity = it?.message?.linear?.x ?: 0.0f
             val angularVelocity = it?.message?.angular?.z ?: 0.0f
             binding.tvLinear.text = "$linearVelocity"
             binding.tvAngular.text = "$angularVelocity"
             Timber.d("V: $linearVelocity ϴ: $angularVelocity")
 
-            loomoBase.setLinearVelocity(linearVelocity)
-            loomoBase.setAngularVelocity(angularVelocity)
+//            loomoBase.setLinearVelocity(linearVelocity)
+//            loomoBase.setAngularVelocity(angularVelocity)
         })
     }
 
     private fun setupPermissions() {
+        /* Location permission -> initiates Listening location updated using Dexter
+        * Tokbox permissions Camera and Microphone using EasyPermissions
+        * */
         setupLocationPermission()
         setupTokBoxPermissions()
     }
 
     private fun initTokbox() {
+        /* TokBox default initialization
+        Get your own session data and token here https://tokbox.com/developer/tools/playground/
+        * */
         tokboxSession = Session.Builder(this, TOKBOX_API_KEY, TOKBOX_SESSION_ID).build()
         tokboxSession.setSessionListener(this)
         tokboxPublisher = Publisher.Builder(this).build()
@@ -95,19 +104,41 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         tokboxSession.connect(TOKBOX_TOKEN)
     }
 
-    private fun setupLoomoHead(){
+    private fun setStaticLoomoHead() {
+        /*
+        * Loomo head has its own Locomotion API, is required to set the Head to a static position
+        * otherwise a remote driving is not achievable
+        * */
         loomoHead.mode = Head.MODE_ORIENTATION_LOCK
         loomoHead.setYawAngularVelocity(0f) // horizontal
-        loomoHead.setPitchAngularVelocity(0f) // vertical TODO test maybe some -15
+        loomoHead.setPitchAngularVelocity(0f) // vertical test -15
     }
 
     override fun onConnected(p0: Session?) {
+        /*
+        * Tokbox connection success
+        * Use this code if you are trying to get Video from an emulator or a common device
+        * In case you are using a Loomo, this code will take the camera located in the head of the Loomo
+        * and running this with also pressing the button "Start Loomo Video Transmission" is gonna crash
+        * */
+        publishVideoToTokbox()
+    }
+
+    private fun publishVideoToTokbox() {
         binding.publisherContainer.addView(tokboxPublisher.view)
         if (tokboxPublisher.view is GLSurfaceView) {
             (tokboxPublisher.view as GLSurfaceView).setZOrderOnTop(true)
         }
         tokboxSession.publish(tokboxPublisher)
     }
+
+    /*
+    * The important stuff ends here
+    * ---------------------------------------------------------
+    * ---------------------------------------------------------
+    * ---------------------------------------------------------
+    * */
+
 
 //    private fun initLoomoVision() {
 //        loomoVision.startListenFrame(StreamType.COLOR) { streamType, frame ->
@@ -128,6 +159,8 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
 //    }
 
     private fun initLoomo() {
+        /* This is copy paste, Loomo SDK's initialization required
+        * */
         loomoBase = Base.getInstance()
         loomoBase.bindService(this, object : ServiceBinder.BindStateListener {
             override fun onUnbind(reason: String?) {
@@ -170,7 +203,7 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
         if (EasyPermissions.hasPermissions(this, *perms)) {
             initTokbox()
         } else {
-            val message = "This app needs access to your camera and mic to make video transmission"
+            val message = "This app needs access to the camera and the microphone"
             EasyPermissions.requestPermissions(this, message, RC_VIDEO_APP_PERM, *perms)
         }
     }
@@ -201,11 +234,14 @@ class MainActivity : AppCompatActivity(), Session.SessionListener, PublisherKit.
 
     @SuppressLint("MissingPermission")
     private fun setupLocationListener() {
+        /* When Location permission is enabled the device enables a location change listener
+        * actually is commented cause from MainViewModel a runnable is sending a default one every 1s
+        * */
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
             1000,
-            0.1f,
+            0.05f,
             object : LocationListener {
                 override fun onLocationChanged(location: Location?) {
 //                    Timber.d("Location lat: ${location?.latitude} lon: ${location?.longitude}")
